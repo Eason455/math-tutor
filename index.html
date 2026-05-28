@@ -2162,37 +2162,37 @@ async function analyzeImage() {
   analysisResult.style.display = 'none';
   
   try {
-    console.log('Uploading image, size:', currentImageData.length, 'bytes');
-    if (currentImageData.length > 200000) {
-      alert('图片太大，请重新拍照');
-      return;
-    }
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 30000);
-    const response = await fetch('https://math-tutor-api-one.vercel.app/api/analyze', {
+    console.log('Calling Xiaomi API directly, image size:', currentImageData.length);
+    
+    const response = await fetch('https://api.xiaomimimo.com/v1/chat/completions', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ image: currentImageData }),
-      signal: controller.signal
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer sk-c3z0o2djgmoak0zgjdzagyk18cg8vmk33b9fz89ip4fpo9xu'
+      },
+      body: JSON.stringify({
+        model: 'mimo-v2.5',
+        messages: [{ role: 'user', content: [
+          { type: 'image_url', image_url: { url: currentImageData } },
+          { type: 'text', text: '分析这道数学题：1.题目内容 2.知识点 3.解题步骤。用中文，简洁回答。' }
+        ] }],
+        max_tokens: 800
+      })
     });
-    clearTimeout(timeoutId);
     
     const data = await response.json();
     console.log('API Response:', data);
     
-    if (data.success) {
-      currentAnalysis = data.analysis;
+    if (data.choices && data.choices[0] && data.choices[0].message) {
+      currentAnalysis = data.choices[0].message.content;
       document.getElementById('analysisContent').textContent = currentAnalysis;
       analysisResult.style.display = 'block';
     } else {
-      alert('分析失败: ' + (data.error || '未知错误'));
+      alert('分析失败: ' + (data.error?.message || '未知错误'));
     }
   } catch (err) {
     console.error('Error:', err);
-    const msg = err.name === 'AbortError' 
-      ? '请求超时（15秒），请裁剪图片后重试' 
-      : '网络错误: ' + (err.message || err);
-    alert(msg);
+    alert('网络错误: ' + err.message);
   } finally {
     loadingState.style.display = 'none';
     analyzeBtn.style.display = 'block';
