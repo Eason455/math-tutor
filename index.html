@@ -761,13 +761,13 @@ body {
             <circle cx="8.5" cy="8.5" r="1.5"/>
             <path d="M21 15l-5-5L5 21"/>
           </svg>
-          <p style="margin: 8px 0 4px; color: var(--text-secondary); font-size: 14px;">点击拍照或选择图片</p>
+          <p style="margin: 8px 0 4px; color: var(--text-secondary); font-size: 14px;">点击拍照、从相册选取或选择文件</p>
           <p style="font-size: 11px; color: var(--text-secondary);">支持 JPG、PNG 格式</p>
         </div>
         <img id="previewImage" style="display: none; max-width: 100%; border-radius: 8px;" />
       </div>
       
-      <input type="file" id="fileInput" accept="image/*" capture="environment" style="display: none;" onchange="handleImageUpload(event)" />
+      <input type="file" id="fileInput" accept="image/*" style="display: none;" onchange="handleImageUpload(event)" />
       
       <!-- 分析按钮 -->
       <button id="analyzeBtn" class="btn btn-primary" style="width: 100%; display: none;" onclick="analyzeImage()">
