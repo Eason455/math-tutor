@@ -2178,20 +2178,8 @@ async function analyzeImage() {
     loadingState.style.display = 'none';
     analyzeBtn.style.display = 'block';
   }
-} else {
-      console.error('API Error:', data);
-      alert('分析失败: ' + (data.error?.message || data.error || '未知错误'));
-    }
-  } catch (error) {
-    console.error('API Error:', error);
-    alert('网络错误，请检查网络连接后重试');
-  } finally {
-    loadingState.style.display = 'none';
-    analyzeBtn.style.display = 'block';
-  }
 }
 
-// 保存到错题本
 function saveToMistakes() {
   if (!currentAnalysis) {
     alert('没有可保存的分析结果');
