@@ -2120,7 +2120,7 @@ function handleFileSelect(event) {
     const img = new Image();
     img.onload = function() {
       const canvas = document.createElement('canvas');
-      const MAX_SIZE = 300;
+      const MAX_SIZE = 600;
       let w = img.width, h = img.height;
       
       if (w > MAX_SIZE || h > MAX_SIZE) {
@@ -2132,7 +2132,7 @@ function handleFileSelect(event) {
       canvas.height = h;
       canvas.getContext('2d').drawImage(img, 0, 0, w, h);
       
-      currentImageData = canvas.toDataURL('image/jpeg', 0.4)
+      currentImageData = canvas.toDataURL('image/jpeg', 0.7)
       console.log('Compressed image size:', currentImageData.length);
       
       document.getElementById('previewImage').src = currentImageData;
@@ -2176,7 +2176,7 @@ async function analyzeImage() {
           { type: 'image_url', image_url: { url: currentImageData } },
           { type: 'text', text: '分析这道数学题：1.题目内容 2.知识点 3.解题步骤。用中文，简洁回答。' }
         ] }],
-        max_tokens: 800
+        max_tokens: 1500
       })
     });
     
