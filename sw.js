@@ -1,15 +1,6 @@
-const CACHE_NAME = 'math-tutor-v1';
-const ASSETS = [
-  'index.html',
-  'manifest.json',
-  'icon-192.png',
-  'icon-512.png'
-];
+const CACHE_NAME = 'math-tutor-v2';
 
 self.addEventListener('install', e => {
-  e.waitUntil(
-    caches.open(CACHE_NAME).then(c => c.addAll(ASSETS))
-  );
   self.skipWaiting();
 });
 
@@ -23,7 +14,17 @@ self.addEventListener('activate', e => {
 });
 
 self.addEventListener('fetch', e => {
+  // 网络优先，失败才用缓存
   e.respondWith(
-    caches.match(e.request).then(r => r || fetch(e.request).catch(() => new Response('离线模式', {status: 200})))
+    fetch(e.request)
+      .then(response => {
+        // 更新缓存
+        if (response.ok && e.request.method === 'GET') {
+          const clone = response.clone();
+          caches.open(CACHE_NAME).then(c => c.put(e.request, clone));
+        }
+        return response;
+      })
+      .catch(() => caches.match(e.request))
   );
 });
