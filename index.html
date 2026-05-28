@@ -1268,7 +1268,7 @@ function loadState() {
 
     }
 
-  } catch {
+  } catch(e) {
 
     initState();
 
@@ -2150,21 +2150,15 @@ async function analyzeImage() {
   const loadingState = document.getElementById('loadingState');
   const analysisResult = document.getElementById('analysisResult');
   
-  // 显示加载状态
   analyzeBtn.style.display = 'none';
   loadingState.style.display = 'block';
   analysisResult.style.display = 'none';
   
   try {
-    // 调用 Vercel 代理 API
     const response = await fetch('https://math-tutor-api-one.vercel.app/api/analyze', {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        image: currentImageData
-      })
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ image: currentImageData })
     });
     
     const data = await response.json();
@@ -2172,15 +2166,19 @@ async function analyzeImage() {
     
     if (data.success) {
       currentAnalysis = data.analysis;
-      
-      // 显示分析结果
       document.getElementById('analysisContent').textContent = currentAnalysis;
       analysisResult.style.display = 'block';
     } else {
-      console.error('API Error:', data);
       alert('分析失败: ' + (data.error || '未知错误'));
     }
-    } else {
+  } catch (err) {
+    console.error('Network Error:', err);
+    alert('网络错误，请检查网络后重试');
+  } finally {
+    loadingState.style.display = 'none';
+    analyzeBtn.style.display = 'block';
+  }
+} else {
       console.error('API Error:', data);
       alert('分析失败: ' + (data.error?.message || data.error || '未知错误'));
     }
