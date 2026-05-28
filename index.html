@@ -2089,7 +2089,7 @@ if (!localStorage.getItem('user_name')) {
 
 if ('serviceWorker' in navigator) {
 
-  navigator.serviceWorker.register('sw.js');
+  navigator.serviceWorker.register('sw.js?v=' + Date.now());
 
 }
 
