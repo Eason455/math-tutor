@@ -2156,11 +2156,15 @@ async function analyzeImage() {
   analysisResult.style.display = 'none';
   
   try {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 15000);
     const response = await fetch('https://math-tutor-api-one.vercel.app/api/analyze', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ image: currentImageData })
+      body: JSON.stringify({ image: currentImageData }),
+      signal: controller.signal
     });
+    clearTimeout(timeoutId);
     
     const data = await response.json();
     console.log('API Response:', data);
