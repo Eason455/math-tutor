@@ -2156,9 +2156,9 @@ async function analyzeImage() {
         model: 'mimo-v2.5',
         messages: [{ role: 'user', content: [
           { type: 'image_url', image_url: { url: currentImageData } },
-          { type: 'text', text: '分析这道数学题：1.题目内容 2.知识点 3.解题步骤。用中文，简洁回答。' }
+          { type: 'text', text: '请分析这道数学题。用纯文本回答（不要用Markdown格式），包含：1.题目内容 2.涉及的知识点 3.详细的解题步骤和方法。用中文回答，数学公式用文字描述。' }
         ] }],
-        max_tokens: 1500
+        max_tokens: 4000
       })
     });
     
