@@ -2161,56 +2161,30 @@ async function analyzeImage() {
   analysisResult.style.display = 'none';
   
   try {
-    // 直接调用小米 MiMo 视觉 API
-    const response = await fetch('https://api.xiaomimimo.com/v1/chat/completions', {
+    // 调用 Vercel 代理 API
+    const response = await fetch('https://math-tutor-api-one.vercel.app/api/analyze', {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer your_key_here'
+        'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        model: 'mimo-vision',
-        messages: [
-          {
-            role: 'system',
-            content: `You are a professional high school math teacher. Analyze the math problem in the image and provide:
-1. Problem Content: Accurately transcribe the problem text
-2. Knowledge Points: List the math concepts tested
-3. Error Analysis: If it is a wrong answer, analyze the possible error reasons
-4. Solution Method: Provide clear step-by-step solution
-5. Practice Problems: Suggest 2-3 similar problems for practice
-
-Use concise and easy-to-understand language suitable for first-year high school students.`
-          },
-          {
-            role: 'user',
-            content: [
-              {
-                type: 'image_url',
-                image_url: {
-                  url: currentImageData
-                }
-              },
-              {
-                type: 'text',
-                text: 'Please analyze this math problem. Tell me the problem content, knowledge points, solution method, and if it is a wrong answer, analyze the error reason.'
-              }
-            ]
-          }
-        ],
-        max_tokens: 2000
+        image: currentImageData
       })
     });
     
     const data = await response.json();
     console.log('API Response:', data);
     
-    if (data.choices && data.choices[0] && data.choices[0].message) {
-      currentAnalysis = data.choices[0].message.content;
+    if (data.success) {
+      currentAnalysis = data.analysis;
       
       // 显示分析结果
       document.getElementById('analysisContent').textContent = currentAnalysis;
       analysisResult.style.display = 'block';
+    } else {
+      console.error('API Error:', data);
+      alert('分析失败: ' + (data.error || '未知错误'));
+    }
     } else {
       console.error('API Error:', data);
       alert('分析失败: ' + (data.error?.message || data.error || '未知错误'));
