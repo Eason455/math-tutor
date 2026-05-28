@@ -1,0 +1,28 @@
+{
+  "name": "数学私教 - 你的专属AI数学老师",
+  "short_name": "数学私教",
+  "description": "拍照传题、错因分析、举一反三、定时复习 — 你的专属AI数学老师",
+  "start_url": "index.html",
+  "display": "standalone",
+  "background_color": "#0f172a",
+  "theme_color": "#6366f1",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": [
+    "education",
+    "productivity"
+  ]
+}
