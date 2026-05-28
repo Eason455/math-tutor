@@ -2162,6 +2162,7 @@ async function analyzeImage() {
   analysisResult.style.display = 'none';
   
   try {
+    console.log('Uploading image, size:', currentImageData.length);
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 15000);
     const response = await fetch('https://math-tutor-api-one.vercel.app/api/analyze', {
@@ -2183,8 +2184,11 @@ async function analyzeImage() {
       alert('分析失败: ' + (data.error || '未知错误'));
     }
   } catch (err) {
-    console.error('Network Error:', err);
-    alert('网络错误，请检查网络后重试');
+    console.error('Error:', err);
+    const msg = err.name === 'AbortError' 
+      ? '请求超时（15秒），请裁剪图片后重试' 
+      : '网络错误: ' + (err.message || err);
+    alert(msg);
   } finally {
     loadingState.style.display = 'none';
     analyzeBtn.style.display = 'block';
