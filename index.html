@@ -2109,33 +2109,39 @@ function handleFileSelect(event) {
   
   console.log('File selected:', file.name, file.type, file.size);
   
-  // 验证文件类型
   if (!file.type.startsWith('image/')) {
     alert('请选择图片文件');
     return;
   }
   
-  // 验证文件大小（最大 10MB）
-  if (file.size > 10 * 1024 * 1024) {
-    alert('图片大小不能超过 10MB');
-    return;
-  }
-  
+  // 用 Canvas 压缩图片
   const reader = new FileReader();
   reader.onload = function(e) {
-    currentImageData = e.target.result;
-    console.log('Image loaded, length:', currentImageData.length);
-    
-    // 显示预览
-    document.getElementById('previewImage').src = currentImageData;
-    document.getElementById('previewArea').style.display = 'block';
-    document.getElementById('uploadBtns').style.display = 'none';
-    document.getElementById('analyzeBtn').style.display = 'block';
-    document.getElementById('analysisResult').style.display = 'none';
-  };
-  reader.onerror = function(e) {
-    console.error('FileReader error:', e);
-    alert('读取图片失败，请重试');
+    const img = new Image();
+    img.onload = function() {
+      const canvas = document.createElement('canvas');
+      const MAX_SIZE = 800;
+      let w = img.width, h = img.height;
+      
+      if (w > MAX_SIZE || h > MAX_SIZE) {
+        if (w > h) { h = h * MAX_SIZE / w; w = MAX_SIZE; }
+        else { w = w * MAX_SIZE / h; h = MAX_SIZE; }
+      }
+      
+      canvas.width = w;
+      canvas.height = h;
+      canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+      
+      currentImageData = canvas.toDataURL('image/jpeg', 0.6);
+      console.log('Compressed image size:', currentImageData.length);
+      
+      document.getElementById('previewImage').src = currentImageData;
+      document.getElementById('previewArea').style.display = 'block';
+      document.getElementById('uploadBtns').style.display = 'none';
+      document.getElementById('analyzeBtn').style.display = 'block';
+      document.getElementById('analysisResult').style.display = 'none';
+    };
+    img.src = e.target.result;
   };
   reader.readAsDataURL(file);
 }
