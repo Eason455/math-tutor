@@ -745,42 +745,22 @@ body {
         拍照或选择数学题目图片，AI 帮你分析错因和解题方法
       </p>
       
-      <!-- 图片上传区域 -->
-      <label for="fileInput" id="uploadArea" style="
-        display: block;
-        border: 2px dashed var(--border);
-        border-radius: 12px;
-        padding: 24px;
-        text-align: center;
-        cursor: pointer;
-        transition: all 0.3s;
-        margin-bottom: 12px;
-      ">
-        <div id="uploadPlaceholder">
-          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="var(--text-secondary)" stroke-width="1.5">
-            <rect x="3" y="3" width="18" height="18" rx="2"/>
-            <circle cx="8.5" cy="8.5" r="1.5"/>
-            <path d="M21 15l-5-5L5 21"/>
-          </svg>
-          <p style="margin: 8px 0 4px; color: var(--text-secondary); font-size: 14px;">点击拍照、从相册选取或选择文件</p>
-          <p style="font-size: 11px; color: var(--text-secondary);">支持 JPG、PNG 格式</p>
-        </div>
-        <img id="previewImage" style="display: none; max-width: 100%; border-radius: 8px;" />
-      </label>
+      <!-- 图片预览区域 -->
+      <div id="previewArea" style="display: none; margin-bottom: 12px; text-align: center;">
+        <img id="previewImage" style="max-width: 100%; max-height: 300px; border-radius: 8px; border: 1px solid var(--border);" />
+        <p id="previewHint" style="font-size: 11px; color: var(--text-secondary); margin-top: 8px;">图片已选择，点击下方按钮开始分析</p>
+      </div>
       
-      <input type="file" id="fileInput" accept="image/*" capture="environment" style="display: none;" onchange="handleImageUpload(event)" />
-      
-      <!-- 添加一个不带 capture 的隐藏 input 用于选择文件 -->
-      <input type="file" id="fileInputGallery" accept="image/*" style="display: none;" onchange="handleImageUpload(event)" />
-      
-      <!-- 选择方式按钮 -->
-      <div style="display: flex; gap: 8px; margin-bottom: 12px;">
-        <button type="button" class="btn btn-secondary" style="flex: 1; font-size: 12px;" onclick="document.getElementById('fileInput').click()">
-          📷 拍照
-        </button>
-        <button type="button" class="btn btn-secondary" style="flex: 1; font-size: 12px;" onclick="document.getElementById('fileInputGallery').click()">
-          🖼️ 从相册选
-        </button>
+      <!-- 上传按钮组 -->
+      <div id="uploadBtns" style="display: flex; gap: 8px; margin-bottom: 12px;">
+        <label style="flex: 1;">
+          <input type="file" accept="image/*" capture="environment" style="display:none;" onchange="handleFileSelect(event)">
+          <div class="btn btn-secondary" style="width: 100%; font-size: 13px; cursor: pointer;">📷 拍照</div>
+        </label>
+        <label style="flex: 1;">
+          <input type="file" accept="image/*" style="display:none;" onchange="handleFileSelect(event)">
+          <div class="btn btn-secondary" style="width: 100%; font-size: 13px; cursor: pointer;">🖼️ 从相册选</div>
+        </label>
       </div>
       
       <!-- 分析按钮 -->
@@ -2122,9 +2102,11 @@ let currentAnalysis = null;
 // 不需要后端服务器，直接调用小米 API
 
 // 处理图片上传
-function handleImageUpload(event) {
+function handleFileSelect(event) {
   const file = event.target.files[0];
   if (!file) return;
+  
+  console.log('File selected:', file.name, file.type, file.size);
   
   // 验证文件类型
   if (!file.type.startsWith('image/')) {
@@ -2132,28 +2114,27 @@ function handleImageUpload(event) {
     return;
   }
   
-  // 验证文件大小（最大 5MB）
-  if (file.size > 5 * 1024 * 1024) {
-    alert('图片大小不能超过 5MB');
+  // 验证文件大小（最大 10MB）
+  if (file.size > 10 * 1024 * 1024) {
+    alert('图片大小不能超过 10MB');
     return;
   }
   
   const reader = new FileReader();
   reader.onload = function(e) {
     currentImageData = e.target.result;
+    console.log('Image loaded, length:', currentImageData.length);
     
     // 显示预览
-    const preview = document.getElementById('previewImage');
-    const placeholder = document.getElementById('uploadPlaceholder');
-    const analyzeBtn = document.getElementById('analyzeBtn');
-    
-    preview.src = currentImageData;
-    preview.style.display = 'block';
-    placeholder.style.display = 'none';
-    analyzeBtn.style.display = 'block';
-    
-    // 隐藏之前的结果
+    document.getElementById('previewImage').src = currentImageData;
+    document.getElementById('previewArea').style.display = 'block';
+    document.getElementById('uploadBtns').style.display = 'none';
+    document.getElementById('analyzeBtn').style.display = 'block';
     document.getElementById('analysisResult').style.display = 'none';
+  };
+  reader.onerror = function(e) {
+    console.error('FileReader error:', e);
+    alert('读取图片失败，请重试');
   };
   reader.readAsDataURL(file);
 }
@@ -2255,18 +2236,14 @@ function resetUpload() {
   currentImageData = null;
   currentAnalysis = null;
   
-  const preview = document.getElementById('previewImage');
-  const placeholder = document.getElementById('uploadPlaceholder');
-  const analyzeBtn = document.getElementById('analyzeBtn');
-  const analysisResult = document.getElementById('analysisResult');
-  const fileInput = document.getElementById('fileInput');
+  document.getElementById('previewArea').style.display = 'none';
+  document.getElementById('previewImage').src = '';
+  document.getElementById('uploadBtns').style.display = 'flex';
+  document.getElementById('analyzeBtn').style.display = 'none';
+  document.getElementById('analysisResult').style.display = 'none';
   
-  preview.style.display = 'none';
-  preview.src = '';
-  placeholder.style.display = 'block';
-  analyzeBtn.style.display = 'none';
-  analysisResult.style.display = 'none';
-  fileInput.value = '';
+  // 重置所有 file input
+  document.querySelectorAll('input[type="file"]').forEach(input => input.value = '');
 }
 
 // 添加拖拽上传支持
