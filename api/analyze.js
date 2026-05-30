@@ -54,7 +54,7 @@ module.exports = async function handler(req, res) {
           ]
         }
       ],
-      max_tokens: 1500,
+      max_tokens: 2000,
       temperature: 0.1
     });
 
@@ -85,7 +85,7 @@ module.exports = async function handler(req, res) {
     console.log('[Step 2] DeepSeek analysis starting...');
 
     const deepseekBody = JSON.stringify({
-      model: 'deepseek-chat',
+      model: 'deepseek-v4-pro',
       messages: [
         {
           role: 'system',
@@ -96,7 +96,7 @@ module.exports = async function handler(req, res) {
           content: '下面是通过 OCR 从学生拍摄的数学题图片中提取的文字。请按你的格式分析这道题。\n\n【OCR 提取的题目】\n' + ocrText + '\n\n请开始分析。'
         }
       ],
-      max_tokens: 2500,
+      max_tokens: 4096,
       temperature: 0.3
     });
 
