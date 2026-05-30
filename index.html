@@ -2120,14 +2120,6 @@ async function analyzeImage() {
   loadingState.style.display = 'block';
   analysisResult.style.display = 'none';
   
-  // 更新加载状态文字
-  const loadingText = loadingState.querySelector('p') || loadingState;
-  const updateLoading = (msg) => {
-    const p = loadingState.querySelector('p');
-    if (p) p.textContent = msg;
-  };
-  updateLoading('🔍 正在识别图片文字...');
-  
   try {
     const imgSize = currentImageData.length;
     
@@ -2139,58 +2131,69 @@ async function analyzeImage() {
     }
     
     // ====== 调用 Vercel API（两步流水线） ======
-    const response = await fetch('https://math-tutor-api-one.vercel.app/api/analyze', {
+    // 直接用 MiMo API（支持 CORS），一步完成 OCR + 分析
+    const response = await fetch('https://api.xiaomimimo.com/v1/chat/completions', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ image: currentImageData })
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer sk-c3z0o2djgmoak0zgjdzagyk18cg8vmk33b9fz89ip4fpo9xu'
+      },
+      body: JSON.stringify({
+        model: 'mimo-v2.5',
+        messages: [{
+          role: 'user',
+          content: [
+            { type: 'image_url', image_url: { url: currentImageData } },
+            { type: 'text', text: '请先逐字提取图片中的所有文字和数学符号（包括公式、数字、符号），然后作为一位资深高中数学教师分析这道题。\n\n分析格式：\n## 📖 题目\n## 🔑 考查知识点\n## ❌ 常见错误\n## ✅ 解题步骤\n## 💡 解题技巧\n## 🎯 同类练习' }
+          ]
+        }],
+        max_tokens: 4096,
+        temperature: 0.3
+      })
     });
     
-    updateLoading('🧠 AI 正在深度分析...');
     
     const data = await response.json();
-    
-    if (data.success) {
-      // OCR 文字
-      if (data.ocr_text) {
-        ocrContent.textContent = data.ocr_text;
-        ocrSection.style.display = 'block';
-      } else {
-        ocrSection.style.display = 'none';
-      }
-      
-      // 分析结果（用 markdown 渲染）
-      if (data.analysis) {
-        analysisContent.innerHTML = renderMarkdown(data.analysis);
-      } else {
-        analysisContent.innerHTML = '<p style="color:var(--warning)">⚠️ 分析结果为空，请重试</p>';
-      }
-      
-      // 耗时信息
-      if (data.timing) {
-        timingInfo.innerHTML = '⏱ OCR: ' + (data.timing.ocr/1000).toFixed(1) + 's | 分析: ' + (data.timing.analysis/1000).toFixed(1) + 's | 模型: ' + (data.model || 'MiMo+DeepSeek');
+
+    if (data.choices && data.choices[0]) {
+      const content = data.choices[0].message?.content || '';
+
+      if (content) {
+        // 分离 OCR 结果
+        const ocrMatch = content.match(/【提取的题目原文】\s*([\s\S]*?)(?=##|【)/);
+        if (ocrMatch && ocrMatch[1].trim()) {
+          ocrContent.textContent = ocrMatch[1].trim();
+          ocrSection.style.display = 'block';
+        } else {
+          ocrSection.style.display = 'none';
+        }
+
+        analysisContent.innerHTML = renderMarkdown(content);
+
+        const now = new Date();
+        timingInfo.innerHTML = '⏱ ' + now.toLocaleTimeString() + ' | MiMo-V2.5';
         timingInfo.style.display = 'block';
+        analysisResult.style.display = 'block';
+
+      } else {
+        analysisContent.innerHTML = '<div class="ocr-fail">' +
+          '<div style="font-size:40px;margin-bottom:8px">📷</div>' +
+          '<p style="font-weight:600;color:var(--warning);margin-bottom:8px">未能识别图片内容</p>' +
+          '<p style="font-size:12px;color:var(--text-secondary);line-height:1.8">' +
+          '请确保：<br>1. 题目清晰、光线充足<br>2. 文字在图片中央</p>' +
+          '<button class="btn btn-primary btn-sm" style="margin-top:12px" onclick="showManualInput()">✏️ 手动输入</button>' +
+          '</div>';
+        ocrSection.style.display = 'none';
+        analysisResult.style.display = 'block';
       }
-      
-      analysisResult.style.display = 'block';
-      
-    } else if (data.error === 'OCR_FAILED') {
-      // OCR 失败，显示友好的错误提示
-      analysisContent.innerHTML = '<div class="ocr-fail">' +
-        '<div style="font-size:40px;margin-bottom:8px">📷</div>' +
-        '<p style="font-weight:600;color:var(--warning);margin-bottom:8px">无法识别图片文字</p>' +
-        '<p style="font-size:12px;color:var(--text-secondary);line-height:1.8">' +
-        (data.message || '请确保：<br>1. 题目清晰、光线充足<br>2. 文字在图片中央<br>3. 背景干净无杂物') +
-        '</p>' +
-        '<button class="btn btn-primary btn-sm" style="margin-top:12px" onclick="showManualInput()">✏️ 手动输入题目</button>' +
-        '</div>';
-      ocrSection.style.display = 'none';
-      analysisResult.style.display = 'block';
-      
+
+    } else if (data.error) {
+      const errMsg = data.error?.message || JSON.stringify(data.error);
+      alert('AI 服务错误: ' + errMsg);
     } else {
-      // 其他错误
-      alert('分析失败: ' + (data.error || data.message || '未知错误'));
+      alert('分析失败，请重试');
     }
-    
+
   } catch (err) {
     console.error('Error:', err);
     alert('网络错误: ' + err.message + '。请检查网络连接后重试。');
