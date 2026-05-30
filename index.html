@@ -772,6 +772,20 @@ body {
       <!-- 分析结果区域 -->
       <div id="analysisResult" style="display: none; margin-top: 16px;">
         <div class="card-title" style="font-size: 14px;">📊 分析结果</div>
+        <!-- OCR 原文 -->
+        <div id="ocrSection" style="display:none;margin-bottom:10px;padding:10px 12px;background:rgba(99,102,241,0.08);border-radius:8px;border-left:3px solid var(--accent);">
+          <div style="font-size:11px;color:var(--accent-light);margin-bottom:4px;font-weight:600;">📷 OCR 识别原文</div>
+          <div id="ocrContent" style="font-size:13px;line-height:1.7;color:var(--text-secondary);white-space:pre-wrap;"></div>
+        </div>
+        <div id="analysisContent" style="
+          background: var(--bg-secondary);
+          border-radius: 8px;
+          padding: 12px;
+          font-size: 13px;
+          line-height: 1.8;
+        ">正在分析...</div>
+        <div id="timingInfo" style="display:none;margin-top:8px;font-size:10px;color:var(--text-muted);text-align:right;"></div>
+      </div
         <div id="analysisContent" style="
           background: var(--bg-secondary);
           border-radius: 8px;
@@ -2138,67 +2152,137 @@ async function analyzeImage() {
   const analyzeBtn = document.getElementById('analyzeBtn');
   const loadingState = document.getElementById('loadingState');
   const analysisResult = document.getElementById('analysisResult');
+  const ocrSection = document.getElementById('ocrSection');
+  const ocrContent = document.getElementById('ocrContent');
   const analysisContent = document.getElementById('analysisContent');
+  const timingInfo = document.getElementById('timingInfo');
   
   analyzeBtn.style.display = 'none';
   loadingState.style.display = 'block';
   analysisResult.style.display = 'none';
   
+  // 更新加载状态文字
+  const loadingText = loadingState.querySelector('p') || loadingState;
+  const updateLoading = (msg) => {
+    const p = loadingState.querySelector('p');
+    if (p) p.textContent = msg;
+  };
+  updateLoading('🔍 正在识别图片文字...');
+  
   try {
     const imgSize = currentImageData.length;
-    console.log('Image size:', imgSize);
     
-    // 如果图片太大，提示用户
-    if (imgSize > 5000000) {
-      alert('图片太大（' + Math.round(imgSize/1024/1024) + 'MB），请重新拍照');
+    if (imgSize > 8000000) {
+      alert('图片太大（' + Math.round(imgSize/1024/1024) + 'MB），请重新拍照或裁剪');
       loadingState.style.display = 'none';
       analyzeBtn.style.display = 'block';
       return;
     }
     
-    const response = await fetch('https://api.xiaomimimo.com/v1/chat/completions', {
+    // ====== 调用 Vercel API（两步流水线） ======
+    const response = await fetch('https://math-tutor-api-one.vercel.app/api/analyze', {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer sk-c3z0o2djgmoak0zgjdzagyk18cg8vmk33b9fz89ip4fpo9xu'
-      },
-      body: JSON.stringify({
-        model: 'mimo-v2.5',
-        messages: [{ role: 'user', content: [
-          { type: 'image_url', image_url: { url: currentImageData } },
-          { type: 'text', text: '请分析这道数学题。用纯文本回答，包含：1.题目内容 2.知识点 3.解题步骤。' }
-        ] }],
-        max_tokens: 2000
-      })
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ image: currentImageData })
     });
     
-    console.log('Response status:', response.status);
+    updateLoading('🧠 AI 正在深度分析...');
+    
     const data = await response.json();
-    console.log('Full response:', JSON.stringify(data).substring(0, 500));
     
-    // 检查各种可能的响应格式
-    let content = '';
-    if (data.choices && data.choices[0]) {
-      const msg = data.choices[0].message || {};
-      content = msg.content || msg.reasoning_content || '';
-    }
-    
-    if (content) {
-      currentAnalysis = content;
-      analysisContent.textContent = content;
+    if (data.success) {
+      // OCR 文字
+      if (data.ocr_text) {
+        ocrContent.textContent = data.ocr_text;
+        ocrSection.style.display = 'block';
+      } else {
+        ocrSection.style.display = 'none';
+      }
+      
+      // 分析结果（用 markdown 渲染）
+      if (data.analysis) {
+        analysisContent.innerHTML = renderMarkdown(data.analysis);
+      } else {
+        analysisContent.innerHTML = '<p style="color:var(--warning)">⚠️ 分析结果为空，请重试</p>';
+      }
+      
+      // 耗时信息
+      if (data.timing) {
+        timingInfo.innerHTML = '⏱ OCR: ' + (data.timing.ocr/1000).toFixed(1) + 's | 分析: ' + (data.timing.analysis/1000).toFixed(1) + 's | 模型: ' + (data.model || 'MiMo+DeepSeek');
+        timingInfo.style.display = 'block';
+      }
+      
       analysisResult.style.display = 'block';
-    } else if (data.error) {
-      alert('AI 错误: ' + (data.error.message || JSON.stringify(data.error)));
+      
+    } else if (data.error === 'OCR_FAILED') {
+      // OCR 失败，显示友好的错误提示
+      analysisContent.innerHTML = '<div class="ocr-fail">' +
+        '<div style="font-size:40px;margin-bottom:8px">📷</div>' +
+        '<p style="font-weight:600;color:var(--warning);margin-bottom:8px">无法识别图片文字</p>' +
+        '<p style="font-size:12px;color:var(--text-secondary);line-height:1.8">' +
+        (data.message || '请确保：<br>1. 题目清晰、光线充足<br>2. 文字在图片中央<br>3. 背景干净无杂物') +
+        '</p>' +
+        '<button class="btn btn-primary btn-sm" style="margin-top:12px" onclick="showManualInput()">✏️ 手动输入题目</button>' +
+        '</div>';
+      ocrSection.style.display = 'none';
+      analysisResult.style.display = 'block';
+      
     } else {
-      alert('未收到分析结果，请重试');
-      console.log('Unexpected response:', data);
+      // 其他错误
+      alert('分析失败: ' + (data.error || data.message || '未知错误'));
     }
+    
   } catch (err) {
     console.error('Error:', err);
-    alert('错误: ' + err.message);
+    alert('网络错误: ' + err.message + '。请检查网络连接后重试。');
   } finally {
     loadingState.style.display = 'none';
     analyzeBtn.style.display = 'block';
+  }
+}
+
+// 简单 Markdown 渲染
+function renderMarkdown(text) {
+  if (!text) return '';
+  let html = text
+    // 标题
+    .replace(/^### (.+)$/gm, '<h3 style="font-size:15px;font-weight:700;margin:12px 0 6px;color:var(--accent-light)">$1</h3>')
+    .replace(/^## (.+)$/gm, '<h2 style="font-size:17px;font-weight:700;margin:16px 0 8px;color:var(--accent)">$1</h2>')
+    .replace(/^# (.+)$/gm, '<h1 style="font-size:19px;font-weight:800;margin:18px 0 10px">$1</h1>')
+    // 粗体
+    .replace(/\*\*(.+?)\*\*/g, '<strong style="color:var(--accent-light)">$1</strong>')
+    // 列表
+    .replace(/^- (.+)$/gm, '<li style="margin:4px 0 4px 16px;font-size:13px">$1</li>')
+    .replace(/^(\d+)\. (.+)$/gm, '<div style="margin:6px 0;font-size:13px"><strong>$1.</strong> $2</div>')
+    // 换行
+    .replace(/
+
+/g, '<br><br>')
+    .replace(/
+/g, '<br>');
+  
+  // 包裹连续的 <li> 在 <ul> 中
+  html = html.replace(/(<li[^>]*>.*?<\/li>\s*)+/g, '<ul style="list-style:disc;padding-left:20px;margin:8px 0">$&</ul>');
+  
+  return html;
+}
+
+// 手动输入题目
+function showManualInput() {
+  const text = prompt('请手动输入或粘贴题目文字：', '');
+  if (text && text.trim().length > 5) {
+    // 用 OCR 文本直接调分析（发送空图片 + 文字）
+    const manualText = text.trim();
+    // 存储到 currentAnalysis 并在 UI 显示
+    const analysisContent = document.getElementById('analysisContent');
+    const ocrSection = document.getElementById('ocrSection');
+    const ocrContent = document.getElementById('ocrContent');
+    ocrContent.textContent = manualText;
+    ocrSection.style.display = 'block';
+    analysisContent.innerHTML = '<p style="color:var(--text-secondary)">📝 题目已手动输入。请点击"重新分析"按钮用 AI 分析。</p>';
+    // 存储文本作为 currentImageData 的特殊标记
+    currentImageData = 'TEXT:' + manualText;
+    document.getElementById('analyzeBtn').textContent = '🔄 重新分析';
   }
 }
 
