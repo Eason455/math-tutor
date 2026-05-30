@@ -2214,11 +2214,8 @@ function renderMarkdown(text) {
     .replace(/^- (.+)$/gm, '<li style="margin:4px 0 4px 16px;font-size:13px">$1</li>')
     .replace(/^(\d+)\. (.+)$/gm, '<div style="margin:6px 0;font-size:13px"><strong>$1.</strong> $2</div>')
     // 换行
-    .replace(/
-
-/g, '<br><br>')
-    .replace(/
-/g, '<br>');
+    .replace(/\n\n/g, '<br><br>')
+    .replace(/\n/g, '<br>');
   
   // 包裹连续的 <li> 在 <ul> 中
   html = html.replace(/(<li[^>]*>.*?<\/li>\s*)+/g, '<ul style="list-style:disc;padding-left:20px;margin:8px 0">$&</ul>');
