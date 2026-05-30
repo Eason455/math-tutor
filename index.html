@@ -735,83 +735,9 @@ body {
 
       <h2 id="greeting">👋 你好！</h2>
 
-      <p>今天也要加油学数学！<br>把不会的题拍照发企业微信给我，我帮你分析错因 👇</p>
+      <p>今天也要加油学数学！<br>点击下方 📸 拍照 Tab 拍题分析，AI 帮你讲解 👇</p>
 
       <div class="deco"></div>
-
-    <!-- ===== 拍照上传分析 ===== -->
-    <div class="card" style="margin-top: 16px;">
-      <div class="card-title">📸 拍照分析错题</div>
-      <p style="font-size: 12px; color: var(--text-secondary); margin-bottom: 12px;">
-        拍照或选择数学题目图片，AI 帮你分析错因和解题方法
-      </p>
-      
-      <!-- 图片预览区域 -->
-      <div id="previewArea" style="display: none; margin-bottom: 12px; text-align: center;">
-        <img id="previewImage" style="max-width: 100%; max-height: 300px; border-radius: 8px; border: 1px solid var(--border);" />
-        <p id="previewHint" style="font-size: 11px; color: var(--text-secondary); margin-top: 8px;">图片已选择，点击下方按钮开始分析</p>
-      </div>
-      
-      <!-- 上传按钮组 -->
-      <div id="uploadBtns" style="display: flex; gap: 8px; margin-bottom: 12px;">
-        <label style="flex: 1;">
-          <input type="file" accept="image/*" capture="environment" style="display:none;" onchange="handleFileSelect(event)">
-          <div class="btn btn-secondary" style="width: 100%; font-size: 13px; cursor: pointer;">📷 拍照</div>
-        </label>
-        <label style="flex: 1;">
-          <input type="file" accept="image/*" style="display:none;" onchange="handleFileSelect(event)">
-          <div class="btn btn-secondary" style="width: 100%; font-size: 13px; cursor: pointer;">🖼️ 从相册选</div>
-        </label>
-      </div>
-      
-      <!-- 分析按钮 -->
-      <button id="analyzeBtn" class="btn btn-primary" style="width: 100%; display: none;" onclick="analyzeImage()">
-        🔍 开始分析
-      </button>
-      
-      <!-- 分析结果区域 -->
-      <div id="analysisResult" style="display: none; margin-top: 16px;">
-        <div class="card-title" style="font-size: 14px;">📊 分析结果</div>
-        <!-- OCR 原文 -->
-        <div id="ocrSection" style="display:none;margin-bottom:10px;padding:10px 12px;background:rgba(99,102,241,0.08);border-radius:8px;border-left:3px solid var(--accent);">
-          <div style="font-size:11px;color:var(--accent-light);margin-bottom:4px;font-weight:600;">📷 OCR 识别原文</div>
-          <div id="ocrContent" style="font-size:13px;line-height:1.7;color:var(--text-secondary);white-space:pre-wrap;"></div>
-        </div>
-        <div id="analysisContent" style="
-          background: var(--bg-secondary);
-          border-radius: 8px;
-          padding: 12px;
-          font-size: 13px;
-          line-height: 1.8;
-        ">正在分析...</div>
-        <div id="timingInfo" style="display:none;margin-top:8px;font-size:10px;color:var(--text-muted);text-align:right;"></div>
-      </div
-        <div id="analysisContent" style="
-          background: var(--bg-secondary);
-          border-radius: 8px;
-          padding: 12px;
-          font-size: 13px;
-          line-height: 1.6;
-          white-space: pre-wrap;
-          max-height: 400px;
-          overflow-y: auto;
-        "></div>
-        <div style="margin-top: 12px; display: flex; gap: 8px;">
-          <button class="btn btn-secondary" style="flex: 1;" onclick="saveToMistakes()">📝 保存到错题本</button>
-          <button class="btn btn-secondary" style="flex: 1;" onclick="resetUpload()">🔄 重新上传</button>
-        </div>
-      </div>
-      
-      <!-- 加载状态 -->
-      <div id="loadingState" style="display: none; text-align: center; padding: 20px;">
-        <div class="spinner"></div>
-        <p style="margin-top: 8px; color: var(--text-secondary); font-size: 13px;">AI 正在分析中...</p>
-      </div>
-    </div>
-
-    </div>
-
-
 
     <div class="stats-grid">
 
@@ -893,20 +819,52 @@ body {
 
 
 
-  <!-- ===== 知识 ===== -->
+  <!-- ===== 拍照分析 ===== -->
 
-  <div class="page" id="page-knowledge">
+  <div class="page" id="page-camera">
 
-    <div class="section-title">📚 高一数学知识地图</div>
+    <div class="section-title">📸 拍照分析错题</div>
 
     <p style="font-size:12px;color:var(--text-secondary);margin-bottom:16px">
-
-      点击知识点标记掌握状态，我会根据你的错题自动更新
-
+      拍照或选择数学题目图片，AI 自动 OCR 识别 + 深度分析
     </p>
 
-    <div id="knowledgeTree"></div>
+    <!-- 上传按钮组 -->
+    <div id="uploadBtns" style="display: flex; gap: 8px; margin-bottom: 12px;">
+      <label style="flex: 1;">
+        <input type="file" accept="image/*" capture="environment" style="display:none;" onchange="handleFileSelect(event)">
+        <div class="btn btn-secondary" style="width: 100%; font-size: 14px; cursor: pointer; text-align: center; padding: 12px;">📷 拍照</div>
+      </label>
+      <label style="flex: 1;">
+        <input type="file" accept="image/*" style="display:none;" onchange="handleFileSelect(event)">
+        <div class="btn btn-secondary" style="width: 100%; font-size: 14px; cursor: pointer; text-align: center; padding: 12px;">🖼️ 相册</div>
+      </label>
+    </div>
 
+    <!-- 图片预览 -->
+    <div id="previewArea" style="display: none; margin-bottom: 12px; text-align: center;">
+      <img id="previewImage" style="max-width: 100%; max-height: 300px; border-radius: 8px; border: 1px solid var(--border);" />
+      <p style="font-size: 11px; color: var(--text-secondary); margin-top: 6px;">✅ 图片已选择</p>
+    </div>
+
+    <!-- 分析按钮 -->
+    <button id="analyzeBtn" class="btn btn-primary" style="width: 100%; display: none; padding: 14px; font-size: 15px;" onclick="analyzeImage()">🔍 开始分析</button>
+
+    <!-- 加载状态 -->
+    <div id="loadingState" style="display: none; text-align: center; padding: 30px 12px;">
+      <div class="spinner"></div>
+      <p style="margin-top: 10px; color: var(--text-secondary); font-size: 13px;">AI 分析中...</p>
+    </div>
+
+    <!-- 分析结果 -->
+    <div id="analysisResult" style="display: none; margin-top: 16px;">
+      <div id="ocrSection" style="display:none;margin-bottom:10px;padding:10px 12px;background:rgba(99,102,241,0.08);border-radius:8px;border-left:3px solid var(--accent);">
+        <div style="font-size:10px;color:var(--accent-light);margin-bottom:4px;font-weight:600;">📷 OCR 识别原文</div>
+        <div id="ocrContent" style="font-size:13px;line-height:1.7;color:var(--text-secondary);white-space:pre-wrap;"></div>
+      </div>
+      <div id="analysisContent" style="font-size:13px;line-height:1.8;"></div>
+      <div id="timingInfo" style="display:none;margin-top:8px;font-size:10px;color:var(--text-muted);text-align:right;"></div>
+    </div>
   </div>
 
 
@@ -1037,7 +995,7 @@ body {
 
 <!-- ============ FAB ============ -->
 
-<button class="fab" onclick="showAddMistakeModal()" id="fabBtn">
+<button class="fab" onclick="switchTab('camera')" id="fabBtn" title="拍照分析">
 
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
 
@@ -1057,11 +1015,11 @@ body {
 
   </button>
 
-  <button class="tab-item" data-tab="knowledge" onclick="switchTab('knowledge')">
+  <button class="tab-item" data-tab="camera" onclick="switchTab('camera')">
 
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg>
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/></svg>
 
-    <span>知识</span>
+    <span>拍照</span>
 
   </button>
 
@@ -1517,11 +1475,10 @@ function switchTab(tab) {
 
 // ============================================
 
+
 function updateAllViews() {
 
   updateHome();
-
-  updateKnowledgeTree();
 
   updateMistakeList();
 
