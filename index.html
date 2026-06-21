@@ -1388,6 +1388,13 @@ body {
       <p style="font-size:11px;color:var(--text-secondary);margin-top:6px"<span data-i18n="imageSelected">图片已选择</span></p>
     </div>
     <button id="analyzeBtn" class="btn btn-primary" style="width:calc(100% - 48px);margin:0 24px;display:none;padding:14px;font-size:15px" onclick="analyzeImage()"><span data-i18n="btnAnalyze">开始分析</span></button>
+    <div id="demoSection" style="display:none;text-align:center;margin:16px 24px;padding:14px;background:var(--bg-card);border-radius:14px;border:1px dashed var(--border)">
+      <p style="font-size:13px;color:var(--text-secondary);margin-bottom:10px"><span data-i18n="demoHint">还没设置 API Key？</span></p>
+      <button class="btn btn-outline" onclick="runDemoAnalysis()" style="font-size:13px;font-weight:600;padding:10px 24px">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="vertical-align:-3px;margin-right:6px"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+        <span data-i18n="btnDemo">体验演示（免 Key）</span>
+      </button>
+    </div>
     <div id="loadingState" style="display:none">
       <div class="spinner"></div>
       <p style="margin-top:10px;color:var(--text-secondary);font-size:13px"<span data-i18n="aiAnalyzing">AI 分析中...</span></p>
@@ -1487,7 +1494,7 @@ body {
         <path d="M4 22h16"/><path d="M10 22V2h4v20"/><path d="M8 22h8"/>
       </svg>
       <div style="font-size:16px;font-weight:700" id="streakDays">0</div>
-      <div style="font-size:12px;color:var(--text-secondary)"<span data-i18n="activeDays">活跃天数</span></div>
+      <div style="font-size:12px;color:var(--text-secondary)"<span data-i18n="streakDays">连续学习天数</span></div>
     </div>
     <div class="card">
       <div class="card-title" data-i18n="howToUse">使用说明</div>
@@ -1500,6 +1507,20 @@ body {
       </div>
     </div>
     
+    <!-- Data Export/Import -->
+    <div class="card">
+      <div class="card-title" style="margin-bottom:8px">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        数据备份
+      </div>
+      <div style="display:flex;gap:8px">
+        <button class="btn btn-outline" onclick="exportAllData()" style="flex:1;font-size:12px;padding:8px">导出备份</button>
+        <button class="btn btn-outline" onclick="document.getElementById('importFileInput').click()" style="flex:1;font-size:12px;padding:8px">恢复备份</button>
+        <input type="file" id="importFileInput" accept=".json" style="display:none" onchange="importAllData(event)">
+      </div>
+      <div style="font-size:11px;color:var(--text-muted);margin-top:8px">导出 JSON 备份到本地，换设备可恢复。API Key 不包含在导出中。</div>
+    </div>
+
     <!-- Language Toggle -->
     <div class="card" style="display:flex;align-items:center;justify-content:space-between;padding:14px 18px">
       <div style="display:flex;align-items:center;gap:10px">
@@ -1718,6 +1739,12 @@ body {
     </svg>
     <span data-i18n="tabMistakes">错题</span>
   </button>
+  <button class="tab-item" data-tab="knowledge" onclick="switchTab('knowledge')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/>
+    </svg>
+    <span data-i18n="tabKnowledge">知识</span>
+  </button>
   <button class="tab-item" data-tab="profile" onclick="switchTab('profile')">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
       <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/>
@@ -1754,6 +1781,17 @@ body {
       <button class="btn btn-secondary" onclick="hideModal()"><span data-i18n="btnCancel">取消</span></button>
             <button class="btn btn-primary" onclick="saveMistake()"><span data-i18n="btnSave">保存</span></button>
           </div>
+  </div>
+</div>
+
+<!-- ============ CONFIRM MODAL (replaces browser confirm) ============ -->
+<div class="modal-overlay" id="confirmModal" onclick="if(event.target===this)closeConfirm(false)">
+  <div class="modal" style="text-align:center;max-width:320px">
+    <p id="confirmMsg" style="font-size:14px;line-height:1.6;margin-bottom:20px;color:var(--text-primary);white-space:pre-wrap"></p>
+    <div class="btn-row">
+      <button class="btn btn-secondary" onclick="closeConfirm(false)"><span data-i18n="btnCancel">取消</span></button>
+      <button class="btn btn-primary" id="confirmOkBtn" onclick="closeConfirm(true)"><span data-i18n="btnConfirm">确定</span></button>
+    </div>
   </div>
 </div>
 
@@ -1920,15 +1958,17 @@ function startTutorial() {
   var msg = lang === 'en'
     ? 'Would you like to try a guided tutorial?\n\nExperience the full error analysis workflow with a sample problem.'
     : '\u8981\u4e0d\u8981\u4f53\u9a8c\u4e00\u4e0b\u65b0\u624b\u6559\u7a0b\uff1f\n\n\u7528\u4e00\u9053\u793a\u4f8b\u9519\u9898\u4f53\u9a8c\u5b8c\u6574\u7684\u5206\u6790\u6d41\u7a0b\u3002';
-  if (!confirm(msg)) {
-    localStorage.setItem('tutorial_done', '1');
-    return;
-  }
-  tutorialStep = 0;
-  tutorialActive = true;
-  tutorialAnalysisDone = false;
-  switchTab('camera');
-  setTimeout(function() { showTutorialStep(0); }, 500);
+  showConfirm(msg, function(ok) {
+    if (!ok) {
+      localStorage.setItem('tutorial_done', '1');
+      return;
+    }
+    tutorialStep = 0;
+    tutorialActive = true;
+    tutorialAnalysisDone = false;
+    switchTab('camera');
+    setTimeout(function() { showTutorialStep(0); }, 500);
+  });
 }
 
 function showTutorialStep(idx) {
@@ -2535,6 +2575,11 @@ function switchTab(tab) {
     if (dh) dh.style.display = (!isTouchDevice() && !isMobileDevice()) ? 'block' : 'none';
     var uh = document.getElementById('uploadHint');
     if (uh && !currentImageData) uh.style.display = 'block';
+    // Show demo section when no API keys set
+    var demoSection = document.getElementById('demoSection');
+    if (demoSection) {
+      demoSection.style.display = hasApiKeys() ? 'none' : 'block';
+    }
   }
 
   // Scroll to top
@@ -2959,21 +3004,27 @@ function updateReviewList() {
 
 function updateProfile() {
 
-  // Streak calculation
-
-  const today = getTodayStr();
-
-  let streak = state.streak.count || 0;
-
-  // Simple: count unique days with activity
-
+  // Streak calculation — true consecutive days from today backwards
   const activeDays = new Set();
+  state.mistakes.forEach(function(m) { activeDays.add(m.date); });
+  state.reviews.filter(function(r) { return r.done; }).forEach(function(r) { activeDays.add(r.dueDate); });
 
-  state.mistakes.forEach(m => activeDays.add(m.date));
-
-  state.reviews.filter(r => r.done).forEach(r => activeDays.add(r.dueDate));
-
-  document.getElementById('streakDays').textContent = activeDays.size;
+  // Count consecutive days from today backwards
+  var consecutive = 0;
+  var checkDate = new Date();
+  for (var i = 0; i < 365; i++) {
+    var d = checkDate.toISOString().split('T')[0];
+    if (activeDays.has(d)) {
+      consecutive++;
+      checkDate.setDate(checkDate.getDate() - 1);
+    } else if (i === 0) {
+      // Today might not have activity yet, skip
+      checkDate.setDate(checkDate.getDate() - 1);
+    } else {
+      break;
+    }
+  }
+  document.getElementById('streakDays').textContent = consecutive;
 
 
 
@@ -3069,6 +3120,22 @@ document.getElementById('modal').addEventListener('click', function(e) {
 
 });
 
+// ============================================
+// CONFIRM MODAL (replaces browser confirm())
+// ============================================
+var _confirmCallback = null;
+
+function showConfirm(msg, callback) {
+  document.getElementById('confirmMsg').textContent = msg;
+  document.getElementById('confirmModal').classList.add('show');
+  _confirmCallback = callback;
+}
+
+function closeConfirm(result) {
+  document.getElementById('confirmModal').classList.remove('show');
+  if (_confirmCallback) { _confirmCallback(result); _confirmCallback = null; }
+}
+
 
 
 // ============================================
@@ -3107,7 +3174,9 @@ function fetchWithTimeout(url, options, timeoutMs) {
 
 function resetAllData() {
 
-  if (confirm(currentLang === 'en' ? 'Reset all data? This cannot be undone!' : '确定要重置所有数据吗？此操作不可撤销！')) {
+  var resetMsg = currentLang === 'en' ? 'Reset all data? This cannot be undone!' : '确定要重置所有数据吗？此操作不可撤销！';
+  showConfirm(resetMsg, function(ok) {
+    if (!ok) return;
 
     localStorage.removeItem('math_tutor_state');
     localStorage.removeItem('onboarding_shown');
@@ -3117,7 +3186,7 @@ function resetAllData() {
     showToast(t('toastReset'));
     location.reload();
 
-  }
+  });
 
 }
 
@@ -3152,10 +3221,13 @@ function importAllData(event) {
   var file = event.target.files[0];
   if (!file) return;
 
-  if (!confirm(currentLang === 'en' ? 'Import will replace ALL current data. Continue?' : '导入将覆盖所有现有数据，确定继续？')) {
-    event.target.value = '';
-    return;
-  }
+  var importMsg = currentLang === 'en' ? 'Import will replace ALL current data. Continue?' : '导入将覆盖所有现有数据，确定继续？';
+  var fileInput = event.target;
+  showConfirm(importMsg, function(ok) {
+    if (!ok) {
+      fileInput.value = '';
+      return;
+    }
 
   var reader = new FileReader();
   reader.onload = function(e) {
@@ -3176,6 +3248,7 @@ function importAllData(event) {
   };
   reader.readAsText(file);
   event.target.value = '';
+  }); // close showConfirm
 }
 
 
@@ -3228,6 +3301,52 @@ if ('serviceWorker' in navigator) {
 
 }
 
+// ============================================
+// NOTIFICATION REMINDERS
+// ============================================
+(function checkReviewReminders() {
+  if (!('Notification' in window)) return;
+  if (Notification.permission === 'granted') {
+    scheduleReviewNotification();
+  }
+})();
+
+function requestNotificationPermission() {
+  if (!('Notification' in window)) return;
+  if (Notification.permission === 'default') {
+    Notification.requestPermission().then(function(perm) {
+      if (perm === 'granted') scheduleReviewNotification();
+    });
+  }
+}
+
+function scheduleReviewNotification() {
+  try {
+    var state = JSON.parse(localStorage.getItem('math_tutor_state') || '{}');
+    var reviews = state.reviews || [];
+    var today = new Date().toISOString().split('T')[0];
+    var pending = reviews.filter(function(r) { return r.dueDate === today && !r.done; });
+    if (pending.length === 0) return;
+    // Don't show notification if already shown today
+    var lastNotify = localStorage.getItem('math_last_notify_date');
+    if (lastNotify === today) return;
+    localStorage.setItem('math_last_notify_date', today);
+    // Schedule for evening (8pm) if current time is before then
+    var now = new Date();
+    var target = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 20, 0, 0);
+    var delay = target.getTime() - now.getTime();
+    if (delay < 0) delay = 1000; // already past 8pm, show in 1s
+    if (delay > 86400000) delay = 1000; // safety cap
+    setTimeout(function() {
+      new Notification('数学私教', {
+        body: '你今天有 ' + pending.length + ' 条复习任务待完成，现在去看看吧！',
+        icon: 'icon-192.png',
+        tag: 'math-review',
+        requireInteraction: true
+      });
+    }, delay);
+  } catch(e) {}
+}
 
 // ===== 拍照上传分析功能 =====
 
@@ -3319,10 +3438,70 @@ function hasApiKeys() {
 
 function showKeyMissingAlert(provider) {
   var names = {mimo: 'MiMo (' + t('mimoUse') + ')', deepseek: 'DeepSeek (' + t('dsUse') + ')'};
-  var msg = t('toastKeyMissing');
   showToast(t('toastKeyMissing'), 'warning');
-  // Switch to profile tab so user can enter keys
-  setTimeout(function() { switchTab('profile'); }, 100);
+  // Show demo section on camera page instead of forcing profile switch
+  var demoSection = document.getElementById('demoSection');
+  if (demoSection) demoSection.style.display = 'block';
+}
+
+// 免 Key 演示模式 — 用预设样例题展示分析效果
+function runDemoAnalysis() {
+  document.getElementById('uploadBtns').style.display = 'none';
+  document.getElementById('uploadHint').style.display = 'none';
+  document.getElementById('previewArea').style.display = 'none';
+  document.getElementById('analyzeBtn').style.display = 'none';
+  var demoSection = document.getElementById('demoSection');
+  if (demoSection) demoSection.style.display = 'none';
+
+  var loadingState = document.getElementById('loadingState');
+  var analysisResult = document.getElementById('analysisResult');
+  var loadingText = loadingState.querySelector('p');
+  if (loadingText) loadingText.textContent = t('loadingMimo');
+  loadingState.style.display = 'block';
+  analysisResult.style.display = 'none';
+
+  // Simulate async analysis with delay
+  setTimeout(function() {
+    if (loadingText) loadingText.textContent = t('aiAnalyzing');
+  }, 1200);
+
+  setTimeout(function() {
+    loadingState.style.display = 'none';
+    analysisResult.style.display = 'block';
+
+    var ocrSection = document.getElementById('ocrSection');
+    var ocrContent = document.getElementById('ocrContent');
+    var analysisContent = document.getElementById('analysisContent');
+    var timingInfo = document.getElementById('timingInfo');
+    var analysisActions = document.getElementById('analysisActions');
+
+    ocrSection.style.display = 'block';
+    ocrContent.textContent = '[Demo] 已知 $f(x) = x^3 - 3x^2 + 2$，求:\n(1) $f(x)$ 的单调区间\n(2) $f(x)$ 在 $[-1, 3]$ 上的最大值和最小值';
+
+    analysisContent.innerHTML = renderMarkdown(
+      '## 错因分析\n\n### 错误类型：概念不清\n\n这位同学在求导后判断单调性时出现了符号错误。\n\n' +
+      '### 正确解法\n\n**Step 1** 求导\n$$f\'(x) = 3x^2 - 6x = 3x(x - 2)$$\n\n' +
+      '**Step 2** 找临界点\n令 $f\'(x)=0$，得 $x=0$ 或 $x=2$\n\n' +
+      '**Step 3** 判断单调性\n- $x<0$ 时 $f\'(x)>0$，递增\n- $0<x<2$ 时 $f\'(x)<0$，递减\n- $x>2$ 时 $f\'(x)>0$，递增\n\n' +
+      '**Step 4** 求最值\n$f(-1)=-2$, $f(0)=2$, $f(2)=-2$, $f(3)=2$\n所以最大值 $2$，最小值 $-2$。\n\n' +
+      '### 涉及知识点\n- 函数性质（单调性）\n- 导数在研究函数中的应用\n\n' +
+      '> [!] 这是演示模式，设置 API Key 后可分析你自己的题目。'
+    );
+
+    timingInfo.style.display = 'block';
+    timingInfo.textContent = '[Demo] 分析用时 0.8s | MiMo + DeepSeek';
+
+    analysisActions.style.display = 'flex';
+    document.getElementById('similarBtn').style.display = 'none'; // 演示模式不显示举一反三
+
+    // Show ask FAB
+    var fab = document.getElementById('askFab');
+    if (fab) fab.classList.add('show');
+
+    // Store demo analysis text for save
+    currentAnalysis = analysisContent.textContent;
+    document.getElementById('ocrContent').textContent = ocrContent.textContent;
+  }, 2500);
 }
 
 function loadApiKeys() {
@@ -3367,12 +3546,15 @@ function saveApiKeys() {
 }
 
 function clearApiKeys() {
-  if (!confirm(currentLang === 'en' ? 'Clear saved API keys? Photo analysis will stop working.' : '确定要清除已保存的 API Key 吗？清除后拍照分析功能将无法使用。')) return;
-  localStorage.removeItem('hermes_mimo_key');
-  localStorage.removeItem('hermes_deepseek_key');
-  document.getElementById('mimoKeyInput').value = '';
-  document.getElementById('deepseekKeyInput').value = '';
-  updateKeyStatus();
+  var clearMsg = currentLang === 'en' ? 'Clear saved API keys? Photo analysis will stop working.' : '确定要清除已保存的 API Key 吗？清除后拍照分析功能将无法使用。';
+  showConfirm(clearMsg, function(ok) {
+    if (!ok) return;
+    localStorage.removeItem('hermes_mimo_key');
+    localStorage.removeItem('hermes_deepseek_key');
+    document.getElementById('mimoKeyInput').value = '';
+    document.getElementById('deepseekKeyInput').value = '';
+    updateKeyStatus();
+  });
 }
 
 function updateKeyStatus() {
@@ -3498,11 +3680,13 @@ function getAnalysisHistory() {
 }
 
 function deleteHistoryItem(id) {
-  if (!confirm(t('confirmDelete'))) return;
-  var history = getAnalysisHistory();
-  history = history.filter(function(h) { return h.id !== id; });
-  localStorage.setItem('analysis_history', JSON.stringify(history));
-  renderHomeHistory();
+  showConfirm(t('confirmDelete'), function(ok) {
+    if (!ok) return;
+    var history = getAnalysisHistory();
+    history = history.filter(function(h) { return h.id !== id; });
+    localStorage.setItem('analysis_history', JSON.stringify(history));
+    renderHomeHistory();
+  });
 }
 
 function viewHistoryItem(id) {
@@ -4288,7 +4472,7 @@ var I18N = {
     // Header
     appTitle: '数学学习分析平台',
     // Tabs
-    tabHome: '首页', tabCamera: '拍照', tabReview: '复习', tabMistakes: '错题', tabProfile: '我的',
+    tabHome: '首页', tabCamera: '拍照', tabReview: '复习', tabMistakes: '错题', tabKnowledge: '知识', tabProfile: '我的',
     // Home page
     greeting: '你好，同学！',
     heroTitle: 'AI 数学\n学习分析',
@@ -4425,12 +4609,12 @@ var I18N = {
         ctaText: '准备好提升数学成绩了吗？', startPhotoAnalysis: '开始拍照分析',
         camTitle: '拍照分析错题', camSub: '拍照或选择数学题目图片，AI 自动 OCR 识别 + 深度分析',
         desktopHint: '拍照功能需要手机才能使用。在电脑上可以点击下方按钮上传已保存的图片。',
-        btnTakePhoto: '拍照', btnGallery: '相册', aiAnalyzing: 'AI 分析中...', ocrOriginal: 'OCR 识别原文',
+        btnTakePhoto: '拍照', btnGallery: '相册', demoHint: '还没设置 API Key？', btnDemo: '体验演示（免 Key）', aiAnalyzing: 'AI 分析中...', ocrOriginal: 'OCR 识别原文',
         askTitle: '提问', mistakesPageTitle: '错题本',
         mistakesSub: '把不会的题拍照发企业微信给我，我来分析错因并自动记录在这里',
         reviewPlanTitle: '复习计划', today: '今日', completed: '已完成', overdue: '逾期',
         knowledgeTitle: '知识图谱', knowledgeSub: '点击知识点切换掌握状态，跟踪你的学习进度',
-        profilePageTitle: '学习档案', activeDays: '活跃天数', howToUse: '使用说明',
+        profilePageTitle: '学习档案', streakDays: '连续学习天数', howToUse: '使用说明',
         apiDescInline: '填入你自己的 API Key，费用由你自己承担。',
         apiDesc2Inline: 'Key 只存在你手机里，不会上传。',
         mimoKeyLabel: 'MiMo Key（拍照识别用）', dsKeyLabel: 'DeepSeek Key（题目分析用）',
@@ -4488,7 +4672,7 @@ var I18N = {
     // Header
     appTitle: 'Math Study Analysis',
     // Tabs
-    tabHome: 'Home', tabCamera: 'Camera', tabReview: 'Review', tabMistakes: 'Mistakes', tabProfile: 'Profile',
+    tabHome: 'Home', tabCamera: 'Camera', tabReview: 'Review', tabMistakes: 'Mistakes', tabKnowledge: 'Knowledge', tabProfile: 'Profile',
     // Home page
     greeting: 'Hello, Student!',
     heroTitle: 'AI Math\nStudy Analysis',
@@ -4625,12 +4809,12 @@ var I18N = {
         ctaText: 'Ready to improve your math scores?', startPhotoAnalysis: 'Start Photo Analysis',
         camTitle: 'Photo Analysis', camSub: 'Take a photo or select a math problem image. AI auto OCR + deep analysis.',
         desktopHint: 'Camera requires a mobile device. On desktop, you can upload saved images using the button below.',
-        btnTakePhoto: 'Camera', btnGallery: 'Gallery', aiAnalyzing: 'AI Analyzing...', ocrOriginal: 'OCR Recognition',
+        btnTakePhoto: 'Camera', btnGallery: 'Gallery', demoHint: 'No API Key yet?', btnDemo: 'Try Demo (No Key)', aiAnalyzing: 'AI Analyzing...', ocrOriginal: 'OCR Recognition',
         askTitle: 'Ask', mistakesPageTitle: 'Mistakes',
         mistakesSub: 'Send unsolvable problems via WeChat. AI analyzes errors and records them here.',
         reviewPlanTitle: 'Review Plan', today: 'Today', completed: 'Completed', overdue: 'Overdue',
         knowledgeTitle: 'Knowledge Map', knowledgeSub: 'Tap topics to toggle mastery status. Track your learning progress.',
-        profilePageTitle: 'Study Profile', activeDays: 'Active Days', howToUse: 'How to Use',
+        profilePageTitle: 'Study Profile', streakDays: 'Day Streak', howToUse: 'How to Use',
         apiDescInline: 'Enter your own API keys. You pay for usage.',
         apiDesc2Inline: 'Keys are stored only on your device.',
         mimoKeyLabel: 'MiMo Key (for photo recognition)', dsKeyLabel: 'DeepSeek Key (for problem analysis)',
