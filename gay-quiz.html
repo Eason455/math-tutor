@@ -1,0 +1,174 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#100f1b">
+<meta name="description" content="随机抽题的 Gay 含量娱乐测试。只是一场玩笑，不代表真实性取向或统计概率。">
+<title>Gay 含量测试 | 随机娱乐自测</title>
+<style>
+:root{color-scheme:dark;--bg:#100f1b;--panel:#191827;--panel2:#211f32;--ink:#f6f2ff;--muted:#aaa5bc;--line:#37334c;--pink:#ff83a8;--violet:#ab94ff;--gold:#ffd38c;--good:#a4e6cc;--radius:24px}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;background:radial-gradient(ellipse at 16% 0%,rgba(155,112,255,.17),transparent 34rem),radial-gradient(ellipse at 95% 22%,rgba(255,131,168,.13),transparent 31rem),var(--bg);color:var(--ink);font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI","Microsoft YaHei",sans-serif}
+button{font:inherit}
+.shell{width:min(100% - 32px,860px);margin:0 auto;padding:26px 0 52px}
+.topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:58px}
+.brand{display:flex;align-items:center;gap:10px;color:var(--ink);font-size:12px;font-weight:800;letter-spacing:.16em}
+.brand-mark{width:32px;height:32px;color:var(--pink)}
+.lang{border:1px solid var(--line);border-radius:999px;background:rgba(255,255,255,.035);color:var(--ink);padding:9px 14px;cursor:pointer;font-weight:700}
+.lang:hover,.lang:focus-visible{border-color:var(--violet);outline:none}
+main{min-height:420px}
+.hero{text-align:center;padding:4px 0 32px}
+.kicker{display:inline-flex;align-items:center;gap:8px;color:var(--gold);font-size:11px;letter-spacing:.16em;text-transform:uppercase;font-weight:800}
+.kicker:before,.kicker:after{content:"";width:24px;height:1px;background:currentColor;opacity:.65}
+h1{font-size:clamp(38px,8vw,68px);letter-spacing:-.055em;line-height:1.04;margin:18px 0 14px}
+.gradient{background:linear-gradient(100deg,#ff9ab5 8%,#c2aaff 55%,#ffd38c);-webkit-background-clip:text;background-clip:text;color:transparent}
+.lede{max-width:610px;margin:0 auto;color:var(--muted);font-size:16px;line-height:1.8}
+.panel{position:relative;overflow:hidden;border:1px solid rgba(255,255,255,.1);border-radius:var(--radius);background:linear-gradient(145deg,rgba(35,32,53,.94),rgba(23,22,37,.96));box-shadow:0 24px 80px rgba(0,0,0,.28)}
+.intro-panel{padding:clamp(24px,5vw,44px)}
+.panel-top{display:flex;align-items:center;gap:12px;margin-bottom:22px}
+.spark{width:40px;height:40px;display:grid;place-items:center;border-radius:14px;background:rgba(255,131,168,.12);color:var(--pink)}
+.panel-title{font-size:15px;font-weight:800}
+.panel-sub{color:var(--muted);font-size:13px;margin-top:3px}
+.feature-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:25px 0}
+.feature{border:1px solid var(--line);border-radius:16px;padding:15px;background:rgba(255,255,255,.025)}
+.feature strong{display:block;font-size:13px;margin-bottom:6px}
+.feature span{display:block;color:var(--muted);font-size:12px;line-height:1.55}
+.cta{display:inline-flex;align-items:center;justify-content:center;gap:11px;border:0;border-radius:14px;padding:15px 22px;color:#1b1424;background:linear-gradient(110deg,#ff9ab5,#c4aaff 65%,#ffe0a7);font-weight:850;cursor:pointer;box-shadow:0 8px 28px rgba(189,145,255,.18);transition:transform .18s ease,filter .18s ease}
+.cta:hover{transform:translateY(-2px);filter:brightness(1.06)}
+.cta:focus-visible,.option:focus-visible,.back:focus-visible{outline:2px solid var(--gold);outline-offset:3px}
+.cta svg{width:18px;height:18px}
+.disclaimer{margin:20px auto 0;padding:13px 15px;border:1px solid rgba(255,211,140,.2);border-radius:14px;background:rgba(255,211,140,.045);color:#d8c9ac;font-size:12px;line-height:1.7}
+.source-note{margin:22px 0 0;color:var(--muted);font-size:11px;line-height:1.7}
+.source-note a{color:#c3b2ff;text-decoration:underline;text-underline-offset:3px}
+.quiz-panel{padding:clamp(22px,5vw,40px)}
+.quiz-meta{display:flex;justify-content:space-between;align-items:center;color:var(--muted);font-size:13px;font-weight:700}
+.progress{height:7px;background:#343146;border-radius:999px;overflow:hidden;margin:15px 0 30px}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--pink),var(--violet),var(--gold));border-radius:inherit;transition:width .25s ease}
+.question{font-size:clamp(22px,4.3vw,32px);line-height:1.35;letter-spacing:-.025em;margin:0 0 23px}
+.options{display:grid;gap:10px}
+.option{display:flex;align-items:center;gap:13px;width:100%;text-align:left;padding:15px;border:1px solid var(--line);border-radius:15px;background:rgba(255,255,255,.025);color:var(--ink);cursor:pointer;transition:border-color .16s,background .16s,transform .16s}
+.option:hover{transform:translateY(-1px);border-color:#72688f;background:rgba(255,255,255,.05)}
+.option.selected{border-color:var(--violet);background:rgba(171,148,255,.13)}
+.option-index{width:28px;height:28px;flex:none;display:grid;place-items:center;border-radius:9px;background:rgba(255,255,255,.07);color:var(--muted);font-size:12px;font-weight:800}
+.option.selected .option-index{background:var(--violet);color:#171323}
+.option-text{font-size:14px;line-height:1.5}
+.quiz-actions{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:25px}
+.back{border:1px solid var(--line);border-radius:13px;padding:12px 15px;color:var(--muted);background:transparent;cursor:pointer}
+.back:hover{color:var(--ink);border-color:#72688f}
+.cta:disabled{cursor:not-allowed;filter:grayscale(.8);opacity:.45;transform:none}
+.quiz-foot{margin:17px 0 0;text-align:center;font-size:11px;color:var(--muted)}
+.result-panel{padding:clamp(24px,6vw,48px);text-align:center}
+.result-label{color:var(--gold);font-size:12px;text-transform:uppercase;letter-spacing:.15em;font-weight:800}
+.score{font-size:clamp(76px,18vw,136px);line-height:1;letter-spacing:-.07em;font-weight:900;margin:17px 0 4px;background:linear-gradient(115deg,#ff9ab5,#c1aaff 55%,#ffe0a7);-webkit-background-clip:text;background-clip:text;color:transparent}
+.score-caption{font-size:13px;color:var(--muted)}
+.score-track{height:10px;max-width:500px;margin:25px auto 25px;background:#343146;border-radius:999px;overflow:hidden}
+.score-fill{height:100%;border-radius:inherit;background:linear-gradient(90deg,var(--pink),var(--violet),var(--gold))}
+.result-title{font-size:clamp(23px,4.5vw,34px);margin:8px 0}
+.result-copy{max-width:540px;margin:0 auto;color:#d3cfe0;line-height:1.8}
+.joke{max-width:540px;margin:19px auto 25px;padding:15px 17px;border-left:2px solid var(--pink);border-radius:0 14px 14px 0;background:rgba(255,131,168,.07);color:#f2c4d2;font-size:14px;line-height:1.75}
+.result-actions{display:flex;justify-content:center}
+.site-footer{margin:34px auto 0;padding-top:20px;border-top:1px solid rgba(255,255,255,.08);color:var(--muted);font-size:11px;line-height:1.8;text-align:center}
+.site-footer a{color:#c3b2ff;text-decoration:underline;text-underline-offset:3px}
+.site-footer p{margin:5px 0}
+@media(max-width:620px){.shell{width:min(100% - 22px,860px);padding-top:18px}.topbar{margin-bottom:39px}.feature-grid{grid-template-columns:1fr}.feature{display:flex;align-items:center;gap:14px}.feature strong{min-width:96px;margin:0}.hero{padding-bottom:25px}.lede{font-size:14px}.intro-panel{padding:22px}.quiz-panel{padding:21px}.option{padding:13px}.quiz-actions{align-items:stretch}.quiz-actions .cta,.quiz-actions .back{padding-inline:13px}.quiz-actions .cta{flex:1}.quiz-actions .back{max-width:140px}}
+@media(prefers-reduced-motion:reduce){*,*:before,*:after{scroll-behavior:auto!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="shell">
+<header class="topbar">
+<div class="brand"><svg class="brand-mark" viewBox="0 0 40 40" fill="none" aria-hidden="true"><path d="M20 3.5 24.2 15.8 36.5 20l-12.3 4.2L20 36.5l-4.2-12.3L3.5 20l12.3-4.2L20 3.5Z" stroke="currentColor" stroke-width="2.4" stroke-linejoin="round"/><circle cx="30.5" cy="9.5" r="2" fill="currentColor"/></svg><span>GAYDAR LAB</span></div>
+<button class="lang" id="language" type="button" aria-label="Switch language">EN</button>
+</header>
+<main id="app" aria-live="polite"></main>
+<footer class="site-footer" id="footer"></footer>
+</div>
+<script>
+"use strict";
+const copy={
+"zh-CN":{
+pageTitle:"Gay 含量测试 | 随机娱乐自测",eyebrow:"随机抽题 · 纯属娱乐",title:"测测你的<br><span class=\"gradient\">Gay 含量</span>",lede:"每次从原创题库里随机抽出 12 题。答完看看本局的 Gaydar 梗分，别把它当成身份鉴定书。",cardTitle:"这是一场轻松的自我探索小游戏",cardSub:"随机组合题目 · 约 2 分钟 · 结果只在本页生成",feature1:"随机题组",feature1d:"30 道原创题目，每局重抽 12 道。",feature2:"只看感受",feature2d:"围绕心动、关系想象和情绪共鸣。",feature3:"不留记录",feature3d:"回答只在当前页面运行，不会发送或保存。",start:"开始随机抽题",nudge:"小提示：你不需要任何标签来证明自己。",disclaimer:"重要说明：这个百分比是按答题选项算出的娱乐梗分，不是真实概率、诊断或科学测量。性取向由你自己理解和命名，网页测不出来。",sourceLead:"题目主题参考公开自我探索测试中常见的心动、关系想象与情绪共鸣方向，所有题目均为原创改写：",question:"问题",of:"共",next:"下一题",finish:"看本局结果",previous:"上一步",exit:"退出本局",answerHint:"选一个最贴近当下感受的答案",resultLabel:"本局 Gaydar 梗分",scoreCaption:"娱乐分数 · 不代表真实身份概率",resultLow:"你的雷达今天低功耗",resultMid:"捕捉到一点心动信号",resultHigh:"信号挺清晰，值得留意",resultTop:"Gaydar 雷达全功率运行",resultCopy:"这只是随机题目和你的选择组合出的玩笑分数。它可以当作一个聊天话题，不必当作结论。",jokeLow:"你把心动藏得挺深，今晚连枕头的盘问都未必套得出答案。",jokeMid:"有一点信号了。你的脑内小剧场刚开场，枕头已经买好前排票。",jokeHigh:"这雷达一响，恋爱番编剧都开始加班；夜宵和枕头先别急着写观后感。",jokeTop:"看来你的脑内小剧场切到深夜档了，记得给枕头也留张票。",again:"再测一局，重抽题目",footerPrivacy:"隐私：答案只保存在当前页面的运行状态中，刷新或关闭页面即消失。",footerSources:"题目灵感来源：",footerDisclaimer:"无论分数是多少，你对自己的理解都比这个小游戏更重要。"
+},
+"en":{
+pageTitle:"Gay Content Quiz | Random Fun Test",eyebrow:"Random questions · Just for fun",title:"Check your<br><span class=\"gradient\">Gay Content</span>",lede:"Each round draws 12 original questions at random. See your playful Gaydar score, but do not treat it as an identity certificate.",cardTitle:"A lighthearted self-reflection game",cardSub:"Randomized questions · About 2 minutes · Results stay on this page",feature1:"Fresh question set",feature1d:"12 questions drawn from a pool of 30 each round.",feature2:"Feelings, not stereotypes",feature2d:"Questions explore attraction, imagined relationships, and emotional resonance.",feature3:"No saved answers",feature3d:"Your answers run in this page and are never sent or stored.",start:"Draw a random quiz",nudge:"A note: you do not need a label to prove anything about yourself.",disclaimer:"Important: this percentage is a playful score based on your choices, not a real probability, diagnosis, or scientific measure. Only you get to understand and name your orientation; a webpage cannot determine it.",sourceLead:"Question themes draw on common self-reflection topics such as attraction, imagined relationships, and emotional resonance. All questions here are original rewrites:",question:"Question",of:"of",next:"Next question",finish:"See my result",previous:"Previous",exit:"Leave this round",answerHint:"Choose the answer closest to how you feel right now",resultLabel:"Your playful Gaydar score",scoreCaption:"For fun · Not a probability about your identity",resultLow:"Your radar is in low-power mode",resultMid:"A little spark on the radar",resultHigh:"The signal is getting clear",resultTop:"Gaydar radar at full power",resultCopy:"This is a joke score made from a random set of questions and your choices. Treat it as a conversation starter, not a conclusion.",jokeLow:"You keep your crushes under wraps; even a pillow interrogation might not get an answer tonight.",jokeMid:"A little signal. Your inner romance show just started, and the pillow already booked front-row seats.",jokeHigh:"The radar pinged, and the rom-com writers are working overtime. Maybe hold off on the pillow's review for now.",jokeTop:"Your inner cinema has moved to the late-night slot. Save a ticket for the pillow.",again:"Play again with new questions",footerPrivacy:"Privacy: answers live only in this page's current session and disappear when you refresh or close it.",footerSources:"Question inspiration: ",footerDisclaimer:"Whatever the score, your understanding of yourself matters more than this little game."
+}};
+const answerSets={
+attraction:{zh:["完全没感觉","有点好奇","确实会心动","我已经开始想约会地点"],en:["No attraction at all","A little curious","There is a real spark","I am already picking a date spot"]},
+interest:{zh:["基本不会留意","偶尔多看一眼","常常忍不住多看","视线自动开启追踪模式"],en:["I barely notice","An occasional second look","I often sneak another look","My eyes have tracking mode on"]},
+future:{zh:["完全想象不出来","目前还不确定","可以认真想想","这画面让我挺期待"],en:["I cannot picture it","I am not sure yet","I could give it real thought","I would look forward to it"]},
+resonance:{zh:["没什么共鸣","有一点点共鸣","说中了不少","像在偷看我的日记"],en:["It does not resonate","A little bit","Quite a lot of it fits","Did someone read my diary?"]},
+label:{zh:["这个标签和我无关","还没有想过","有点想多了解","听起来意外地合身"],en:["That label feels unrelated","I have not thought about it","I would like to explore it","It feels surprisingly right"]}
+};
+const bank=[
+["attraction","想象和与你同性别的人约会，你的第一反应是什么？","Imagine going on a date with someone of your gender. What is your first reaction?"],
+["attraction","你有没有对同性别的朋友产生过超过普通友情的心动？","Have you ever felt a spark for a same-gender friend that went beyond friendship?"],
+["interest","在人群里，你会不会特别容易注意到有魅力的同性别的人？","In a crowd, do you tend to notice attractive people of your gender?"],
+["future","想象未来伴侣时，你能把与你同性别的人放进画面里吗？","When you picture a future partner, can you imagine someone of your gender?"],
+["resonance","影视作品里同性恋爱故事出现时，你会不会觉得格外被触动？","When a same-gender love story appears on screen, does it move you in a particular way?"],
+["label","想到“我可能是 Gay”这个说法，你内心有什么反应？","When you hear the words “I might be gay,” what happens inside?"],
+["attraction","你是否曾对某位同性别的人心动到反复回想一段对话？","Have you ever replayed a conversation because you had a crush on someone of your gender?"],
+["future","如果一位让你心动的同性别的人邀你约会，你会怎么想？","How would you feel if a same-gender person you liked asked you out?"],
+["resonance","看到同性别情侣自然地分享亲密时，你会有什么感觉？","How do you feel when you see a same-gender couple sharing affection naturally?"],
+["interest","刷社交媒体时，你会不会因为某位同性别的人而停留更久？","While scrolling social media, do you linger because of someone of your gender?"],
+["attraction","一首情歌响起时，你脑中的浪漫主角有时会是同性别的人吗？","When a love song plays, is the romantic lead in your mind sometimes someone of your gender?"],
+["future","和同性别的人牵手、拥抱或表达喜欢，这些画面让你觉得如何？","How do you feel about imagining holding hands, hugging, or showing affection with someone of your gender?"],
+["resonance","听到别人谈探索性取向的经历，你是否会觉得其中一些话像在说你？","When people talk about exploring their orientation, do parts of their stories feel familiar?"],
+["interest","你会不会因为想见到某位同性别的人，而期待某个聚会或活动？","Have you looked forward to an event because you hoped to see someone of your gender there?"],
+["attraction","夸一位同性别的人“真有魅力”时，你是否也感到了一点私人心动？","When you call someone of your gender attractive, is there sometimes a personal spark behind it?"],
+["label","如果朋友温和地问你是否喜欢同性，你会觉得这个问题很贴近自己吗？","If a friend gently asked whether you like people of your gender, would the question feel relevant to you?"],
+["future","写一张理想约会清单时，你会不会把同性别约会对象也考虑进去？","When making a list for an ideal date, would you include someone of your gender?"],
+["resonance","你是否曾怀疑自己对某个同性别朋友的在意程度有点特别？","Have you wondered whether your feelings for a same-gender friend were unusually strong?"],
+["interest","看到一位迷人的同性别人物时，你会不会想知道更多关于 TA 的事？","When you see a charming person of your gender, do you want to know more about them?"],
+["attraction","你是否曾有过“我想和 TA 更亲近一点”的同性别心动时刻？","Have you had a same-gender crush that made you wish you could be closer?"],
+["future","如果可以自由选择且没有旁人评价，你会愿意尝试和同性别的人约会吗？","If nobody judged you, would you be open to dating someone of your gender?"],
+["resonance","同性恋角色找到幸福时，你会不会有种特别的开心或松一口气？","When a gay character finds happiness, do you feel an especially strong joy or sense of relief?"],
+["label","“Gay”这个词被用来形容你时，你会觉得抗拒、好奇，还是有点熟悉？","When the word “gay” is applied to you, does it feel uncomfortable, intriguing, or familiar?"],
+["interest","在聚会上，你会不会不自觉地留意某位同性别的人有没有看向你？","At a gathering, do you catch yourself noticing whether a certain person of your gender looks your way?"],
+["attraction","你是否曾因为同性别的人对你微笑，而开心了一整天？","Have you ever felt happy all day because someone of your gender smiled at you?"],
+["future","想象和同性别的人建立稳定关系，这种可能性对你来说如何？","How does the possibility of a committed relationship with someone of your gender feel?"],
+["resonance","听朋友分享暗恋故事时，你是否会在心里把某些角色换成同性别的人？","When friends talk about crushes, do you ever quietly imagine the crush as someone of your gender?"],
+["attraction","当你发现自己在意某位同性别的人时，你通常会怎么理解这份感觉？","When you notice that you care about someone of your gender, how do you usually read that feeling?"],
+["label","如果不必马上做决定，你愿意花点时间了解自己对同性的感受吗？","If there were no rush to decide, would you be open to exploring your feelings toward your gender?"],
+["future","想象未来生活里的浪漫约会，你觉得对象的性别必须固定吗？","When picturing a romantic date in your future, does the other person's gender have to be fixed?"]
+];
+const app=document.getElementById("app"),footer=document.getElementById("footer"),langButton=document.getElementById("language");
+langButton.setAttribute("aria-label","切换语言");
+let lang="zh-CN",round=[],answers=[],position=0;
+const tr=(key)=>copy[lang][key];
+function escapeHtml(value){return String(value).replace(/[&<>"']/g,function(ch){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[ch]})}
+function shuffled(list){const a=list.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+function setFooter(){footer.innerHTML="<p>"+tr("footerPrivacy")+"</p><p>"+tr("sourceLead")+" <a href=\"https://www.lgbtqquiz.org/am-i-gay-quiz/\" target=\"_blank\" rel=\"noopener noreferrer\">LGBTqQUIZ</a> · <a href=\"https://gayquiz.app/am-i-gay-quiz/\" target=\"_blank\" rel=\"noopener noreferrer\">GayQuiz</a></p><p>"+tr("footerDisclaimer")+"</p>"}
+function renderIntro(){
+document.title=tr("pageTitle");
+app.innerHTML="<section class=\"hero\"><div class=\"kicker\">"+tr("eyebrow")+"</div><h1>"+tr("title")+"</h1><p class=\"lede\">"+tr("lede")+"</p></section>"+
+"<section class=\"panel intro-panel\"><div class=\"panel-top\"><div class=\"spark\"><svg viewBox=\"0 0 24 24\" width=\"22\" height=\"22\" fill=\"none\" aria-hidden=\"true\"><path d=\"m12 2 2.5 7.5L22 12l-7.5 2.5L12 22l-2.5-7.5L2 12l7.5-2.5L12 2Z\" stroke=\"currentColor\" stroke-width=\"1.6\" stroke-linejoin=\"round\"/></svg></div><div><div class=\"panel-title\">"+tr("cardTitle")+"</div><div class=\"panel-sub\">"+tr("cardSub")+"</div></div></div>"+
+"<div class=\"feature-grid\"><div class=\"feature\"><strong>"+tr("feature1")+"</strong><span>"+tr("feature1d")+"</span></div><div class=\"feature\"><strong>"+tr("feature2")+"</strong><span>"+tr("feature2d")+"</span></div><div class=\"feature\"><strong>"+tr("feature3")+"</strong><span>"+tr("feature3d")+"</span></div></div>"+
+"<button class=\"cta\" id=\"start\" type=\"button\">"+tr("start")+"<svg viewBox=\"0 0 24 24\" fill=\"none\" aria-hidden=\"true\"><path d=\"M4 12h15m-6-6 6 6-6 6\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/></svg></button>"+
+"<p class=\"source-note\">"+tr("nudge")+"</p><p class=\"disclaimer\">"+tr("disclaimer")+"</p><p class=\"source-note\">"+tr("sourceLead")+" <a href=\"https://www.lgbtqquiz.org/am-i-gay-quiz/\" target=\"_blank\" rel=\"noopener noreferrer\">LGBTqQUIZ</a> · <a href=\"https://gayquiz.app/am-i-gay-quiz/\" target=\"_blank\" rel=\"noopener noreferrer\">GayQuiz</a></p></section>";
+document.getElementById("start").addEventListener("click",startQuiz)
+}
+function startQuiz(){round=shuffled(bank).slice(0,12);answers=Array(round.length).fill(null);position=0;renderQuestion()}
+function renderQuestion(){
+document.title=tr("pageTitle");
+const q=round[position],opts=answerSets[q[0]][lang==="zh-CN"?"zh":"en"],progress=Math.round(((position+1)/round.length)*100);
+const options=opts.map(function(label,index){const selected=answers[position]===index;return "<button class=\"option"+(selected?" selected":"")+"\" type=\"button\" data-answer=\""+index+"\" aria-pressed=\""+selected+"\"><span class=\"option-index\">"+String.fromCharCode(65+index)+"</span><span class=\"option-text\">"+escapeHtml(label)+"</span></button>"}).join("");
+app.innerHTML="<section class=\"panel quiz-panel\"><div class=\"quiz-meta\"><span>"+tr("question")+" "+(position+1)+" "+tr("of")+" "+round.length+"</span><span>"+progress+"%</span></div><div class=\"progress\" role=\"progressbar\" aria-label=\""+tr("question")+" "+(position+1)+" "+tr("of")+" "+round.length+"\" aria-valuemin=\"0\" aria-valuemax=\"100\" aria-valuenow=\""+progress+"\"><div class=\"progress-fill\" style=\"width:"+progress+"%\"></div></div><h2 class=\"question\">"+escapeHtml(q[lang==="zh-CN"?1:2])+"</h2><div class=\"options\" role=\"group\" aria-label=\""+tr("answerHint")+"\">"+options+"</div><div class=\"quiz-actions\"><button class=\"back\" id=\"back\" type=\"button\">"+(position===0?tr("exit"):tr("previous"))+"</button><button class=\"cta\" id=\"next\" type=\"button\" "+(answers[position]===null?"disabled":"")+">"+(position===round.length-1?tr("finish"):tr("next"))+"<svg viewBox=\"0 0 24 24\" fill=\"none\" aria-hidden=\"true\"><path d=\"M4 12h15m-6-6 6 6-6 6\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/></svg></button></div><p class=\"quiz-foot\">"+tr("answerHint")+"</p></section>";
+app.querySelectorAll("[data-answer]").forEach(function(button){button.addEventListener("click",function(){answers[position]=Number(button.dataset.answer);renderQuestion()})});
+document.getElementById("back").addEventListener("click",function(){if(position===0){round=[];answers=[];renderIntro()}else{position--;renderQuestion()}});
+document.getElementById("next").addEventListener("click",function(){if(answers[position]===null)return;if(position<round.length-1){position++;renderQuestion()}else renderResult()})
+}
+function renderResult(){
+document.title=tr("pageTitle");
+const score=Math.round(answers.reduce(function(sum,value){return sum+value},0)/(answers.length*3)*100);
+const band=score<25?"Low":score<55?"Mid":score<80?"High":"Top";
+const title=tr("result"+band.toLowerCase().replace(/^./,function(c){return c.toUpperCase()}));
+const joke=tr("joke"+band.toLowerCase().replace(/^./,function(c){return c.toUpperCase()}));
+app.innerHTML="<section class=\"panel result-panel\"><div class=\"result-label\">"+tr("resultLabel")+"</div><div class=\"score\" aria-label=\""+score+" percent\">"+score+"<span style=\"font-size:.48em\">%</span></div><div class=\"score-caption\">"+tr("scoreCaption")+"</div><div class=\"score-track\" role=\"meter\" aria-label=\""+tr("resultLabel")+"\" aria-valuemin=\"0\" aria-valuemax=\"100\" aria-valuenow=\""+score+"\"><div class=\"score-fill\" style=\"width:"+score+"%\"></div></div><h2 class=\"result-title\">"+title+"</h2><p class=\"result-copy\">"+tr("resultCopy")+"</p><p class=\"joke\">"+joke+"</p><p class=\"disclaimer\">"+tr("disclaimer")+"</p><div class=\"result-actions\"><button class=\"cta\" id=\"again\" type=\"button\">"+tr("again")+"<svg viewBox=\"0 0 24 24\" fill=\"none\" aria-hidden=\"true\"><path d=\"M20 7v5h-5M4.9 9A7.5 7.5 0 0 1 18 6l2 2M4 17v-5h5m10.1 3A7.5 7.5 0 0 1 6 18l-2-2\" stroke=\"currentColor\" stroke-width=\"1.8\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/></svg></button></div></section>";
+document.getElementById("again").addEventListener("click",startQuiz)
+}
+langButton.addEventListener("click",function(){lang=lang==="zh-CN"?"en":"zh-CN";document.documentElement.lang=lang;langButton.textContent=lang==="zh-CN"?"EN":"中文";langButton.setAttribute("aria-label",lang==="zh-CN"?"切换语言":"Switch language");if(round.length&&answers.length){if(answers.every(function(value){return value!==null})&&app.querySelector(".result-panel"))renderResult();else renderQuestion()}else renderIntro();setFooter()});
+renderIntro();setFooter();
+</script>
+</body>
+</html>
